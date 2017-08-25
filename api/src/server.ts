@@ -9,15 +9,13 @@ import * as logger from "morgan";
 import * as errorHandler from "errorhandler";
 import * as lusca from "lusca";
 import * as dotenv from "dotenv";
-import * as mongo from "connect-mongo";
 import * as flash from "express-flash";
 import * as path from "path";
-import * as mongoose from "mongoose";
 import * as passport from "passport";
 import expressValidator = require("express-validator");
 
 
-const MongoStore = mongo(session);
+
 
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
@@ -43,15 +41,12 @@ import * as passportConfig from "./config/passport";
  */
 const app = express();
 
-/**
- * Connect to MongoDB.
- */
-// mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI || process.env.MONGOLAB_URI);
-
-mongoose.connection.on("error", () => {
-  console.log("MongoDB connection error. Please make sure MongoDB is running.");
-  process.exit();
+const mysql = require("mysql");
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "password",
+  database: "microrecord"
 });
 
 
@@ -71,10 +66,6 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: process.env.SESSION_SECRET,
-  store: new MongoStore({
-    url: process.env.MONGODB_URI || process.env.MONGOLAB_URI,
-    autoReconnect: true
-  })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -88,13 +79,13 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   // After successful login, redirect back to the intended page
   if (!req.user &&
-      req.path !== "/login" &&
-      req.path !== "/signup" &&
-      !req.path.match(/^\/auth/) &&
-      !req.path.match(/\./)) {
+    req.path !== "/login" &&
+    req.path !== "/signup" &&
+    !req.path.match(/^\/auth/) &&
+    !req.path.match(/\./)) {
     req.session.returnTo = req.path;
   } else if (req.user &&
-      req.path == "/account") {
+    req.path == "/account") {
     req.session.returnTo = req.path;
   }
   next();
@@ -126,16 +117,26 @@ app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userControl
  * API examples routes.
  */
 app.get("/api", apiController.getApi);
-app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 
 /**
- * OAuth authentication routes. (Sign in)
+ * API for orders
  */
-app.get("/auth/facebook", passport.authenticate("facebook", { scope: ["email", "public_profile"] }));
-app.get("/auth/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login" }), (req, res) => {
-  res.redirect(req.session.returnTo || "/");
-});
 
+app.get("/api/order", function (req, res, error) {
+  connection.connect();
+
+  connection.query("SELECT * from test", function (err: Error, rows: any, fields: any) {
+    if (err) throw err;
+
+    // console.log("The solution is: ", rows[0].solution);
+    res.send(JSON.stringify(rows));
+  });
+
+
+
+  connection.end();
+
+});
 
 /**
  * Error Handler. Provides full stack - remove for production

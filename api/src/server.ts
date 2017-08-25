@@ -127,8 +127,6 @@ app.get("/api/order", function (req, res, error) {
 
   connection.query("SELECT * from test", function (err: Error, rows: any, fields: any) {
     if (err) throw err;
-
-    // console.log("The solution is: ", rows[0].solution);
     res.send(JSON.stringify(rows));
   });
 

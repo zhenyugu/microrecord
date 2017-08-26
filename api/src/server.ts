@@ -45,7 +45,7 @@ const mysql = require("mysql");
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "password",
+  password: "gzy1992815",
   database: "microrecord"
 });
 

@@ -8,14 +8,13 @@
             "type": "node",
             "request": "attach",
             "name": "Attach",
-            "protocol": "legacy",
             "port": 3000
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}/api/dist/server.js",
+            "program": "${workspaceRoot}/api/app.js",
             "outFiles": [
               
             ]

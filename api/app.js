@@ -4,15 +4,32 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mysql      = require('mysql');
+var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : 'password'
+  host: 'localhost',
+  user: 'root',
+  password: 'password'
 });
 
+connection.connect(function (err) {
+  if (err) throw err;
+  console.log("Connected!");
 
+  connection.query("CREATE DATABASE IF NOT EXISTS microrecord", function (err, result) {
+    if (err) throw err;
+    console.log("Database created");
+  });
+
+  connection.query("USE microrecord");
+
+  var createOrderTable = "CREATE TABLE IF NOT EXISTS orders (id INT NOT NULL, buyer INT NOT NULL,delivery_address INT NOT NULL,provider INT NOT NULL, status INT NOT NULL,total_price DECIMAL(2) NULL,order_time DATETIME NOT NULL,delivery_time DATETIME NULL,confirm_receive_time DATETIME NULL, PRIMARY KEY (id)); ";
+
+  connection.query(createOrderTable, function (err, result) {
+    if (err) throw err;
+    console.log("orders table created");
+  });
+});
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -36,58 +53,65 @@ app.use('/users', users);
 
 // order api
 app.post('/api/order', function (req, res) {
-  connection.connect();
-  
-  connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
-    if (err) throw err;
 
-    res.send(rows);
-    //console.log('The solution is: ', rows[0].solution);
+  var order = req.body;
 
+  var newOrder = {
+    id: req.body.id,
+    buyer: req.body.buyer,
+    delivery_address: req.body.delivery_address,
+    provider: req.body.provider,
+    status: 0,
+    total_price: req.body.total_price,
+    order_time: req.body.order_time,
+    delivery_time: req.body.delivery_time,
+    confirm_receive_time: req.body.confirm_receive_time
+  }
 
+  var userAddSql = 'INSERT INTO microrecord.orders VALUES(0,?,?,?,?,?,?,?,?)';
+  var userAddSql_Params = [req.body.buyer, req.body.delivery_address, req.body.merchant, 0,
+  req.body.total_price, new Date(), null, null];
+
+  connection.query(userAddSql, userAddSql_Params, function (err, result) {
+    if (err) {
+      console.log('[INSERT ERROR] - ', err.message);
+      return;
+    }
+
+    console.log('--------------------------INSERT----------------------------');
+    //console.log('INSERT ID:',result.insertId);        
+    console.log('INSERT ID:', result);
+    console.log('-----------------------------------------------------------------\n\n');
   });
-  
-  connection.end();
- });
+});
 
 app.get('/api/order', function (req, res) {
-  connection.connect();
-  
-  connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+
+  connection.query('select * from orders', function (err, rows, fields) {
     if (err) throw err;
 
     res.send(rows);
-    //console.log('The solution is: ', rows[0].solution);
-
-
   });
-  
-  connection.end();
+
 });
 
 app.get('/api/order/:id', function (req, res) {
-  connection.connect();
 
   var id = req.params.id;
-  
-  connection.query('select * from microrecord.test where id = ' + id, function(err, rows, fields) {
+
+  connection.query('select * from orders where id = ' + id, function (err, rows, fields) {
     if (err) throw err;
 
     res.send(rows);
-    //console.log('The solution is: ', rows[0].solution);
-
-
   });
-  
-  connection.end();
-  //res.send(JSON.stringify({ "a": "b" }));
+
 });
 
 app.put('/api/order/:id', function (req, res) {
   //req.params.id  
 });
 
-app.delete('/api/order/:id', function(req, res){
+app.delete('/api/order/:id', function (req, res) {
 
 });
 

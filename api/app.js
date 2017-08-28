@@ -4,6 +4,15 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mysql      = require('mysql');
+
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : 'password'
+});
+
+
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -26,14 +35,52 @@ app.use('/', index);
 app.use('/users', users);
 
 // order api
-app.post('/api/order', function (req, res) { });
+app.post('/api/order', function (req, res) {
+  connection.connect();
+  
+  connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+    if (err) throw err;
+
+    res.send(rows);
+    //console.log('The solution is: ', rows[0].solution);
+
+
+  });
+  
+  connection.end();
+ });
 
 app.get('/api/order', function (req, res) {
-  res.send(JSON.stringify({ "a": "b" }));
+  connection.connect();
+  
+  connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+    if (err) throw err;
+
+    res.send(rows);
+    //console.log('The solution is: ', rows[0].solution);
+
+
+  });
+  
+  connection.end();
 });
 
 app.get('/api/order/:id', function (req, res) {
-  res.send(JSON.stringify({ "a": "b" }));
+  connection.connect();
+
+  var id = req.params.id;
+  
+  connection.query('select * from microrecord.test where id = ' + id, function(err, rows, fields) {
+    if (err) throw err;
+
+    res.send(rows);
+    //console.log('The solution is: ', rows[0].solution);
+
+
+  });
+  
+  connection.end();
+  //res.send(JSON.stringify({ "a": "b" }));
 });
 
 app.put('/api/order/:id', function (req, res) {

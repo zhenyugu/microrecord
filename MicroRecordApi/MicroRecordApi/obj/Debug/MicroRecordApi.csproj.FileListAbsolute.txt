@@ -183,3 +183,5 @@ D:\Private\sourcecode\microrecord\MicroRecordApi\MicroRecordApi\obj\Debug\MicroR
 D:\Private\sourcecode\microrecord\MicroRecordApi\MicroRecordApi\bin\SendGrid.dll
 D:\Private\sourcecode\microrecord\MicroRecordApi\MicroRecordApi\bin\SendGrid.pdb
 D:\Private\sourcecode\microrecord\MicroRecordApi\MicroRecordApi\bin\SendGrid.xml
+D:\Private\sourcecode\microrecord\MicroRecordApi\MicroRecordApi\bin\Microsoft.Owin.Security.Jwt.dll
+D:\Private\sourcecode\microrecord\MicroRecordApi\MicroRecordApi\bin\Microsoft.Owin.Security.Jwt.xml

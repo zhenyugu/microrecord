@@ -26,7 +26,6 @@ namespace MicroRecordApi.Providers
             {
                 throw new ArgumentNullException("data");
             }
-            var secret = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk";
 
             string audienceId = ConfigurationManager.AppSettings["as:AudienceId"];
 
